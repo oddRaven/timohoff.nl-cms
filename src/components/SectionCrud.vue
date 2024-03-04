@@ -4,36 +4,72 @@ import axios from "axios";
 
 import { type ISection, Section } from '../models/section'
 
+defineExpose({
+    select
+});
+
+const emit = defineEmits(['refresh']);
+
 let section = ref<ISection>();
 
 function clear () {
     section.value = new Section();
 }
 
+function select (selectedSection : any) {
+    section.value = selectedSection;
+}
+
 function save () {
-    console.log(section.value);
-
-    if(section.value && section.value.id) {
-        let url = 'http://localhost/api/section/' + section.value.id;
-        
-        axios.put(url)
-            .then((response) => {
-                section.value = response.data;
-            });
+    if (section.value && section.value.id) {
+        update()
     }
-    else{
-        let url = 'http://localhost/api/section';
+    else {
+        store();
+    }
+}
 
-        axios.post(url, section.value, {
-            withCredentials: true,
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Request-Headers': '*',
-                'Access-Control-Request-Method': '*',
-            }
-        })
+function resolveSave (response : any) {
+    section.value = response.data.section;
+
+    emit('refresh');
+}
+
+function update () {
+    let config = {
+        withCredentials: true
+    };
+
+    let url = 'http://localhost/api/section/' + section.value!.id;
+
+    axios.put(url, section.value, config)
+        .then(resolveSave);
+}
+
+function store () {
+    let config = {
+        withCredentials: true
+    };
+
+    let url = 'http://localhost/api/section';
+
+    axios.post(url, section.value, config)
+        .then(resolveSave);
+}
+
+function delete_ () {
+    if (section.value && section.value.id) {
+        let config = {
+            withCredentials: true
+        };
+
+        let url = 'http://localhost/api/section/' + section.value.id;
+
+        axios.delete(url, config)
             .then((response) => {
-                section.value = response.data;
+                clear();
+
+                emit('refresh');
             });
     }
 }
@@ -44,4 +80,5 @@ function save () {
     
     <input v-if="section" type="text" v-model="section.title" >
     <input v-if="section" type="button" value="Opslaan" @click="save" >
+    <input v-if="section" type="button" value="Verwijder" @click="delete_" >
 </template>

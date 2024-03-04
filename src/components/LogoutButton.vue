@@ -12,8 +12,6 @@ function logout(){
 }
 </script>
 
-<template>
-    <main>
-        <input type="button" value="Logout" @click="logout">
-    </main>
+<template class="abc">
+    <input type="button" value="Logout" @click="logout">
 </template>
