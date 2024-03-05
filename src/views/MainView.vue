@@ -12,8 +12,8 @@ const refresh = () => {
     sectionStructure.value.refresh();
 }
 
-function selectSection (section : any) {
-    sectionCrud.value.select(section);
+function selectSection (sectionId : number) {
+    sectionCrud.value.select(sectionId);
 }
 </script>
 

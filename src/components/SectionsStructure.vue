@@ -12,14 +12,20 @@ const emit = defineEmits(['select']);
 let sections = ref<ISection[]>([]); 
 
 function refresh () {
-    axios.get('http://localhost/api/section')
+    let config = {
+        headers: {
+            'Content-Language': 'en'
+        }
+    };
+
+    axios.get('http://localhost/api/section', config)
         .then((response) => {
             sections.value = response.data;
         });
 }
 
 function select (section : ISection) {
-    emit('select', section);
+    emit('select', section.id);
 }
 
 onMounted(() => {
@@ -29,7 +35,7 @@ onMounted(() => {
 
 <template>
     <ul>
-        <li v-for="section in sections" :key="section.title" @click="select(section)"> {{ section.title }}</li>
+        <li v-for="section in sections" :key="section.id" @click="select(section)"> {{ section.title }}</li>
     </ul>
 </template>
 

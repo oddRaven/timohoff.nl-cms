@@ -11,13 +11,24 @@ defineExpose({
 const emit = defineEmits(['refresh']);
 
 let section = ref<ISection>();
+let dutchTitle = ref();
+let englishTitle = ref();
 
 function clear () {
     section.value = new Section();
+    dutchTitle.value = '';
+    englishTitle.value = '';
 }
 
-function select (selectedSection : any) {
-    section.value = selectedSection;
+function select (sectionId : number) {
+    let url : string = 'http://localhost/api/section/' + sectionId;
+
+    axios.get(url)
+        .then((response) => {
+            section.value = response.data;
+            dutchTitle.value = section.value!.title_translations.filter((translation) => translation.code == 'nl')[0].text;
+            englishTitle.value = section.value!.title_translations.filter((translation) => translation.code == 'en')[0].text;
+        });
 }
 
 function save () {
@@ -51,6 +62,17 @@ function store () {
         withCredentials: true
     };
 
+    section.value!.title_translations = [
+        {
+            code: 'nl',
+            text: dutchTitle.value,
+        },
+        {
+            code: 'en',
+            text: englishTitle.value,
+        }
+    ]
+
     let url = 'http://localhost/api/section';
 
     axios.post(url, section.value, config)
@@ -78,7 +100,8 @@ function delete_ () {
 <template>
     <input type="button" value="Nieuw" @click="clear" >
     
-    <input v-if="section" type="text" v-model="section.title" >
+    <input v-if="section" type="text" v-model="dutchTitle" placeholder="Titel" >
+    <input v-if="section" type="text" v-model="englishTitle" placeholder="Title" >
     <input v-if="section" type="button" value="Opslaan" @click="save" >
     <input v-if="section" type="button" value="Verwijder" @click="delete_" >
 </template>
