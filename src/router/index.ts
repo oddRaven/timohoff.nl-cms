@@ -13,7 +13,7 @@ const router = createRouter({
       path: '/main',
       name: 'main',
       // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
+      // this generates a separate chunk (Main.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/MainView.vue')
     }

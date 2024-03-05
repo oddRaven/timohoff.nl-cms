@@ -36,6 +36,7 @@ onMounted(() => {
 <style scoped>
     ul {
         padding: 0px;
+        margin: 0px;
 
         li {
             list-style: none;

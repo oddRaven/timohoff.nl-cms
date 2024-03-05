@@ -12,6 +12,16 @@ function logout(){
 }
 </script>
 
-<template class="abc">
-    <input type="button" value="Logout" @click="logout">
+<template>
+    <div class="wrapper">
+        <input type="button" value="Logout" @click="logout">
+    </div>
 </template>
+
+<style scoped>
+
+.wrapper {
+    text-align: right;
+}
+
+</style>
