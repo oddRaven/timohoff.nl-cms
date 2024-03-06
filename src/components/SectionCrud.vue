@@ -8,20 +8,21 @@ defineExpose({
     select
 });
 
-const emit = defineEmits(['refresh']);
+const emit = defineEmits(['new', 'refresh']);
 
-let section = ref<ISection>();
-let dutchTitle = ref();
-let englishTitle = ref();
+let section = ref<ISection>(new Section());
+let dutchTitle = ref('');
+let englishTitle = ref('');
 
 function clear () {
     section.value = new Section();
     dutchTitle.value = '';
     englishTitle.value = '';
+    emit('new');
 }
 
-function select (sectionId : number) {
-    let url : string = 'http://localhost/api/section/' + sectionId;
+function select (id : number) {
+    let url : string = 'http://localhost/api/section/' + id;
 
     axios.get(url)
         .then((response) => {
@@ -80,20 +81,22 @@ function store () {
 }
 
 function delete_ () {
-    if (section.value && section.value.id) {
-        let config = {
-            withCredentials: true
-        };
-
-        let url = 'http://localhost/api/section/' + section.value.id;
-
-        axios.delete(url, config)
-            .then((response) => {
-                clear();
-
-                emit('refresh');
-            });
+    if (!section.value || !section.value.id) {
+        return;
     }
+
+    let config = {
+        withCredentials: true
+    };
+
+    let url = 'http://localhost/api/section/' + section.value.id;
+
+    axios.delete(url, config)
+        .then((response) => {
+            clear();
+
+            emit('refresh');
+        });
 }
 </script>
 

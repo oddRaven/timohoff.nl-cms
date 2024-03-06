@@ -1,3 +1,5 @@
+import { type ITranslation } from './translation';
+
 export interface ISection {
     id? : number;
     title : string;
@@ -9,8 +11,3 @@ export class Section implements ISection {
     title : string = '';
     title_translations : ITranslation [] = [];
 };
-
-interface ITranslation {
-    code : string;
-    text : string;
-}
