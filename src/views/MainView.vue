@@ -1,17 +1,20 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+import ArticleCrud from '../components/ArticleCrud.vue'
 import LogoutButton from '../components/LogoutButton.vue'
 import SectionsStructure from '../components/SectionsStructure.vue'
 import SectionCrud from '../components/SectionCrud.vue'
 import SectionItemCrud from '../components/SectionItemCrud.vue'
 
-let sectionStructure = ref();
-let sectionCrud = ref();
-let sectionItemCrud = ref();
-let sectionId = 0;
-
+const articleCrud = ref();
+const sectionStructure = ref();
+const sectionCrud = ref();
+const sectionItemCrud = ref();
 const isSectionSelected = ref(false);
+const isSectionItemArticleSelected = ref();
+
+let sectionId = 0;
 
 const refresh = () => {
     sectionStructure.value.refresh();
@@ -25,14 +28,20 @@ function selectSection (id : number) {
 
 function selectSectionItem (object_ : any) {
     sectionItemCrud.value.select(object_.type_, object_.id);
+
+    if (object_.type_ == 'Articles') {
+        isSectionItemArticleSelected.value = true;
+        articleCrud.value.select(object_.id);
+    }
 }
 
-function saveSectionItem (type_ : string, id : number) {
-    sectionItemCrud.value.store(type_, id, sectionId);
+function storeSectionItem (object_ : any) {
+    sectionItemCrud.value.store(object_.type_, object_.id, sectionId);
 }
 
 function clearSection () {
     isSectionSelected.value = false;
+    isSectionItemArticleSelected.value = false;
 }
 </script>
 
@@ -52,6 +61,10 @@ function clearSection () {
     <div class="content" v-if="isSectionSelected">
         <h2>Section Item edit</h2>
         <SectionItemCrud ref="sectionItemCrud" @refresh="refresh" />
+    </div>
+    <div class="content" v-if="isSectionItemArticleSelected">
+        <h2>Article edit</h2>
+        <ArticleCrud ref="articleCrud" @store="storeSectionItem" />
     </div>
   </main>
 </template>

@@ -73,11 +73,6 @@ function store (type_ : string, id : number, sectionId : number) {
 }
 
 function update () {
-    if (!sectionItem.value!.item_id) {
-        store('Articles', 42, 2);
-        return;
-    }
-
     const config = {
         withCredentials: true
     };
