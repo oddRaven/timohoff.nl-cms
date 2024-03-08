@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import axios from "axios";
 
-import { type ISectionItem, SectionItem } from '../models/section-item'
+import { type ISectionItem } from '../models/section-item'
+import { SectionItemService } from '../services/section-item.service'
 
 defineExpose({
     select,
@@ -14,6 +14,8 @@ const emit = defineEmits(['refresh', 'new']);
 const sectionItem = ref<ISectionItem>();
 const dutchTitle = ref('');
 const englishTitle = ref('');
+
+const sectionItemService = new SectionItemService;
 
 const options = ref([
   { text: 'Article', itemType: 'Articles' },
@@ -30,20 +32,12 @@ function clear () {
 function select (subjectSectionItem : ISectionItem) {
     sectionItem.value = subjectSectionItem;
 
-    if (!sectionItem.value.item_id) {
+    if (!sectionItem.value.item_type || !sectionItem.value.item_id) {
         return;
     }
 
-    const url : string = 'http://localhost/api/section-item/' + sectionItem.value.item_type + '/' + sectionItem.value.item_id;
-
-    const config = {
-        headers: {
-            'Content-Language': 'en'
-        }
-    };
-
-    axios.get(url, config)
-        .then((response) => {
+    sectionItemService.get(sectionItem.value.item_type, sectionItem.value.item_id)
+        .then((response: any) => {
             let data : ISectionItem = response.data as ISectionItem;
             dutchTitle.value = data!.title_translations.filter((translation) => translation.language_code == 'nl')[0].text;
             englishTitle.value = data!.title_translations.filter((translation) => translation.language_code == 'en')[0].text;
@@ -51,15 +45,15 @@ function select (subjectSectionItem : ISectionItem) {
 }
 
 function store (type_ : string, id : number, sectionId : number) {
-    let config = {
-        withCredentials: true
-    };
+    if(!sectionItem.value){
+        return;
+    }
 
-    sectionItem.value!.item_type = type_;
-    sectionItem.value!.item_id = id;
-    sectionItem.value!.section_id = sectionId;
+    sectionItem.value.item_type = type_;
+    sectionItem.value.item_id = id;
+    sectionItem.value.section_id = sectionId;
 
-    sectionItem.value!.title_translations = [
+    sectionItem.value.title_translations = [
         {
             language_code: 'nl',
             text: dutchTitle.value,
@@ -70,18 +64,16 @@ function store (type_ : string, id : number, sectionId : number) {
         }
     ];
 
-    const url = 'http://localhost/api/section-item';
-
-    axios.post(url, sectionItem.value, config)
+    sectionItemService.post(sectionItem.value)
         .then(resolveSave);
 }
 
 function update () {
-    const config = {
-        withCredentials: true
-    };
+    if(!sectionItem.value || !sectionItem.value.item_type || !sectionItem.value.item_id){
+        return;
+    }
 
-    sectionItem.value!.title_translations = [
+    sectionItem.value.title_translations = [
         {
             language_code: 'nl',
             text: dutchTitle.value,
@@ -92,9 +84,7 @@ function update () {
         }
     ];
 
-    const url = 'http://localhost/api/section-item/' + sectionItem.value!.item_type + '/' + sectionItem.value!.item_id;
-
-    axios.put(url, sectionItem.value, config)
+    sectionItemService.put(sectionItem.value.item_type, sectionItem.value.item_id, sectionItem.value)
         .then(resolveSave);
 }
 
@@ -103,18 +93,13 @@ function resolveSave (response : any) {
 }
 
 function delete_ () {
-    if (!sectionItem.value || !sectionItem.value.item_id) {
+    if (!sectionItem.value || !sectionItem.value.item_type || !sectionItem.value.item_id) {
         return;
     }
 
-    const config = {
-        withCredentials: true
-    };
 
-    const url = 'http://localhost/api/section-item/' + sectionItem.value.item_type + '/' + sectionItem.value.item_id;
-
-    axios.delete(url, config)
-        .then((response) => {
+    sectionItemService.delete(sectionItem.value.item_type, sectionItem.value.item_id)
+        .then(() => {
             clear();
 
             emit('refresh');

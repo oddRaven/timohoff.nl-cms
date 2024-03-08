@@ -2,11 +2,14 @@
 import axios from "axios";
 import { useRouter } from 'vue-router';
 
+import { AuthenticationService } from '../services/authentication.service';
+
 const router = useRouter();
+const authenticationService = new AuthenticationService;
 
 function logout(){
-    axios.delete('http://localhost/api/authentication')
-        .then((response) => {
+    authenticationService.logout()
+        .then(() => {
             router.push('/');            
         });
 }

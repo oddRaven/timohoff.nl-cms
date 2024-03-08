@@ -4,6 +4,8 @@ import { ref, onMounted } from 'vue'
 
 import { type ISection } from '../models/section'
 import { type ISectionItem } from '../models/section-item'
+import { SectionService } from '../services/section.service'
+import { SectionItemService } from '../services/section-item.service'
 
 defineExpose({
     refresh
@@ -14,20 +16,15 @@ const emit = defineEmits(['selectSection', 'selectSectionItem']);
 const sections = ref<ISection[]>([]);
 const sectionItems = ref<ISectionItem[]>([]);
 
+const sectionService = new SectionService;
+const sectionItemService = new SectionItemService;
+
 let selectedSection : ISection;
 let selectedSectionItem : ISectionItem;
 
 function refresh () {
-    const config = {
-        headers: {
-            'Content-Language': 'en'
-        }
-    };
-
-    const url = 'http://localhost/api/section';
-
-    axios.get(url, config)
-        .then((response) => {
+    sectionService.getAll()
+        .then(response => {
             sections.value = response.data;
         });
 
@@ -35,20 +32,12 @@ function refresh () {
 }
 
 function refreshSectionItems(){
-    if (selectedSection == null) {
+    if (!selectedSection || !selectedSection.id) {
         sectionItems.value = [];
         return;
     }
 
-    const config = {
-        headers: {
-            'Content-Language': 'en'
-        }
-    };
-
-    const url = 'http://localhost/api/section-item?section_id=' + selectedSection.id;
-
-    axios.get(url, config)
+    sectionItemService.getBySection(selectedSection.id)
         .then((response) => {
             sectionItems.value = response.data;
         });
@@ -107,4 +96,4 @@ onMounted(() => {
             }
         }
     }
-</style>
+</style>../services/section.service

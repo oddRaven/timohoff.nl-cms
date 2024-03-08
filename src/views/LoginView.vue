@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import axios from "axios";
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
+import { AuthenticationService } from '../services/authentication.service'
+
 const router = useRouter();
+const authenticationService = new AuthenticationService;
 
 let username = ref();
 let password = ref();
@@ -14,11 +16,7 @@ function login(){
         'password': password.value
     };
 
-    axios.defaults.withCredentials = true;
-
-    let url = 'http://localhost:80/api/authentication';
-
-    axios.post(url, data)
+    authenticationService.login(data)
         .then((response) => {
             if (response.status == 200) {
                 router.push('/main');

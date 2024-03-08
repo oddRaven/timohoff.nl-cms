@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import axios from "axios";
 
 import { type IArticle, Article } from '../models/article'
+import { ArticleService } from '../services/article.service'
 
 defineExpose({
     select
@@ -18,21 +18,15 @@ const englishTitle = ref<string>('');
 const dutchText = ref<string>('');
 const englishText = ref<string>('');
 
+const articleService = new ArticleService;
+
 function select (id? : number) {
-    if (id == null) {
+    if (!id) {
         article.value = new Article();
         return;
     }
 
-    const url : string = 'http://localhost/api/article/' + id;
-
-    const config = {
-        headers: {
-            'Content-Language': 'en'
-        }
-    };
-
-    axios.get(url, config)
+    articleService.get(id)
         .then((response) => {
             article.value = response.data;
             dutchTitle.value = article.value!.title_translations.filter((translation) => translation.language_code == 'nl')[0].text;
@@ -52,30 +46,22 @@ function save () {
 }
 
 function update () {
-    let config = {
-        withCredentials: true
-    };
+    if(!article.value.id){
+        return;
+    }
 
     setTranslations();
 
-    const url = 'http://localhost/api/article/' + article.value!.id;
-
-    axios.put(url, article.value, config)
+    articleService.put(article.value.id, article.value)
         .then((response : any) => {
             article.value = response.data.article;
         });
 }
 
 function store () {
-    let config = {
-        withCredentials: true
-    };
-
     setTranslations();
 
-    const url = 'http://localhost/api/article';
-
-    axios.post(url, article.value, config)
+    articleService.post(article.value)
         .then((response : any) => {
             article.value = response.data.article;
 

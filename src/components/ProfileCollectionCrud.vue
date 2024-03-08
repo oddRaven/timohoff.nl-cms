@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import axios from "axios";
 
-import { type IProfile, Profile } from '../models/profile'
-import { type IProfileCollection, ProfileCollection } from '../models/profile-collection'
+import { type IProfile } from '../models/profile'
+import { type IProfileCollection } from '../models/profile-collection'
+import { ProfileCollectionService } from '../services/profile-collection.service'
 
 defineExpose({
     select
@@ -17,16 +17,10 @@ const selectedProfile = ref<IProfile>();
 const dutchTitle = ref<string>('');
 const englishTitle = ref<string>('');
 
+const profileCollectionService = new ProfileCollectionService;
+
 function select (id : number) {
-    const url : string = 'http://localhost/api/article/' + id;
-
-    const config = {
-        headers: {
-            'Content-Language': 'en'
-        }
-    };
-
-    axios.get(url, config)
+    profileCollectionService.get(id)
         .then((response) => {
             profileCollection.value = response.data;
             dutchTitle.value = profileCollection.value!.title_translations.filter((translation) => translation.language_code == 'nl')[0].text;

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import axios from "axios";
 
-import { type ISection, Section } from '../models/section'
+import { type ISection } from '../models/section'
+import { SectionService } from '../services/section.service'
 
 defineExpose({
     select
@@ -10,9 +10,11 @@ defineExpose({
 
 const emit = defineEmits(['new', 'refresh']);
 
-let section = ref<ISection>();
-let dutchTitle = ref('');
-let englishTitle = ref('');
+const section = ref<ISection>();
+const dutchTitle = ref('');
+const englishTitle = ref('');
+
+const sectionService = new SectionService;
 
 function clear () {
     dutchTitle.value = '';
@@ -22,9 +24,12 @@ function clear () {
 
 function select (sectionSubject : ISection) {
     section.value = sectionSubject;
-    const url : string = 'http://localhost/api/section/' + section.value.id;
 
-    axios.get(url)
+    if (!section.value.id) {
+        return;
+    }
+
+    sectionService.get(section.value.id)
         .then((response) => {
             let data : ISection = response.data as ISection;
             dutchTitle.value = data.title_translations.filter((translation) => translation.language_code == 'nl')[0].text;
@@ -46,11 +51,11 @@ function resolveSave (response : any) {
 }
 
 function update () {
-    let config = {
-        withCredentials: true
-    };
+    if(!section.value || !section.value.id){
+        return;
+    }
 
-    section.value!.title_translations = [
+    section.value.title_translations = [
         {
             language_code: 'nl',
             text: dutchTitle.value,
@@ -61,18 +66,16 @@ function update () {
         }
     ]
 
-    let url = 'http://localhost/api/section/' + section.value!.id;
-
-    axios.put(url, section.value, config)
+    sectionService.put(section.value.id, section.value)
         .then(resolveSave);
 }
 
 function store () {
-    let config = {
-        withCredentials: true
-    };
+    if(!section.value){
+        return;
+    }
 
-    section.value!.title_translations = [
+    section.value.title_translations = [
         {
             language_code: 'nl',
             text: dutchTitle.value,
@@ -83,9 +86,7 @@ function store () {
         }
     ]
 
-    let url = 'http://localhost/api/section';
-
-    axios.post(url, section.value, config)
+    sectionService.post(section.value)
         .then(resolveSave);
 }
 
@@ -94,14 +95,8 @@ function delete_ () {
         return;
     }
 
-    let config = {
-        withCredentials: true
-    };
-
-    let url = 'http://localhost/api/section/' + section.value.id;
-
-    axios.delete(url, config)
-        .then((response) => {
+    sectionService.delete(section.value.id)
+        .then(() => {
             clear();
 
             emit('refresh');
@@ -116,4 +111,4 @@ function delete_ () {
     <input v-if="section" type="text" v-model="englishTitle" placeholder="Title" >
     <input v-if="section" type="button" value="Opslaan" @click="save" >
     <input v-if="section" type="button" value="Verwijder" @click="delete_" >
-</template>
+</template>../services/section.service
