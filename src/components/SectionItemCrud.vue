@@ -9,27 +9,32 @@ defineExpose({
     store
 });
 
-const emit = defineEmits(['refresh']);
+const emit = defineEmits(['refresh', 'new']);
 
-const sectionItem = ref<ISectionItem>( new SectionItem());
+const sectionItem = ref<ISectionItem>();
 const dutchTitle = ref('');
 const englishTitle = ref('');
-const selectedItemType = ref('Articles');
 
 const options = ref([
   { text: 'Article', itemType: 'Articles' },
   { text: 'Timeline', itemType: 'Timelines' },
-  { text: 'Profiles', itemType: 'Profiles' }
+  { text: 'Profiles', itemType: 'Profile Collections' }
 ]);
 
 function clear () {
-    sectionItem.value = new SectionItem();
     dutchTitle.value = '';
     englishTitle.value = '';
+    emit('new');
 }
 
-function select (type_ : string, id : number) {
-    const url : string = 'http://localhost/api/section-item/' + type_ + '/' + id;
+function select (subjectSectionItem : ISectionItem) {
+    sectionItem.value = subjectSectionItem;
+
+    if (!sectionItem.value.item_id) {
+        return;
+    }
+
+    const url : string = 'http://localhost/api/section-item/' + sectionItem.value.item_type + '/' + sectionItem.value.item_id;
 
     const config = {
         headers: {
@@ -39,10 +44,9 @@ function select (type_ : string, id : number) {
 
     axios.get(url, config)
         .then((response) => {
-            sectionItem.value = response.data;
-            dutchTitle.value = sectionItem.value!.title_translations.filter((translation) => translation.code == 'nl')[0].text;
-            englishTitle.value = sectionItem.value!.title_translations.filter((translation) => translation.code == 'en')[0].text;
-            selectedItemType.value = sectionItem.value!.item_type!;
+            let data : ISectionItem = response.data as ISectionItem;
+            dutchTitle.value = data!.title_translations.filter((translation) => translation.language_code == 'nl')[0].text;
+            englishTitle.value = data!.title_translations.filter((translation) => translation.language_code == 'en')[0].text;
         });
 }
 
@@ -57,14 +61,14 @@ function store (type_ : string, id : number, sectionId : number) {
 
     sectionItem.value!.title_translations = [
         {
-            code: 'nl',
+            language_code: 'nl',
             text: dutchTitle.value,
         },
         {
-            code: 'en',
+            language_code: 'en',
             text: englishTitle.value,
         }
-    ]
+    ];
 
     const url = 'http://localhost/api/section-item';
 
@@ -77,6 +81,17 @@ function update () {
         withCredentials: true
     };
 
+    sectionItem.value!.title_translations = [
+        {
+            language_code: 'nl',
+            text: dutchTitle.value,
+        },
+        {
+            language_code: 'en',
+            text: englishTitle.value,
+        }
+    ];
+
     const url = 'http://localhost/api/section-item/' + sectionItem.value!.item_type + '/' + sectionItem.value!.item_id;
 
     axios.put(url, sectionItem.value, config)
@@ -84,8 +99,6 @@ function update () {
 }
 
 function resolveSave (response : any) {
-    sectionItem.value = response.data.sectionItem;
-
     emit('refresh');
 }
 
@@ -115,10 +128,10 @@ function delete_ () {
     <input v-if="sectionItem" type="text" v-model="dutchTitle" placeholder="Titel" >
     <input v-if="sectionItem" type="text" v-model="englishTitle" placeholder="Title" >
 
-    <select v-model="selectedItemType">
+    <select v-if="sectionItem" v-model="sectionItem.item_type">
         <option v-for="option in options" :key="option.itemType" :value="option.itemType">{{ option.text }}</option>
     </select>
 
-    <input v-if="sectionItem" type="button" value="Opslaan" @click="update" >
-    <input v-if="sectionItem" type="button" value="Verwijder" @click="delete_" >
+    <input v-if="sectionItem && sectionItem.item_id" type="button" value="Opslaan" @click="update" >
+    <input v-if="sectionItem && sectionItem.item_id" type="button" value="Verwijder" @click="delete_" >
 </template>

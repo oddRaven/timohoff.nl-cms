@@ -2,46 +2,59 @@
 import { ref } from 'vue'
 
 import ArticleCrud from '../components/ArticleCrud.vue'
+import ProfileCollectionCrud from '../components/ProfileCollectionCrud.vue'
+import ProfileCrud from '../components/ProfileCrud.vue'
 import LogoutButton from '../components/LogoutButton.vue'
 import SectionsStructure from '../components/SectionsStructure.vue'
 import SectionCrud from '../components/SectionCrud.vue'
 import SectionItemCrud from '../components/SectionItemCrud.vue'
 
+import { type ISection, Section } from '../models/section'
+import { type ISectionItem, SectionItem } from '../models/section-item'
+
 const articleCrud = ref();
+const profilesCrud = ref();
+const profileCrud = ref();
 const sectionStructure = ref();
 const sectionCrud = ref();
 const sectionItemCrud = ref();
-const isSectionSelected = ref(false);
-const isSectionItemArticleSelected = ref();
 
-let sectionId = 0;
+const selectedSection = ref<ISection>();
+const selectedSectionItem = ref<ISectionItem>();
 
 const refresh = () => {
     sectionStructure.value.refresh();
 }
 
-function selectSection (id : number) {
-    isSectionSelected.value = true;
-    sectionId = id;
-    sectionCrud.value.select(id);
+function selectSection (section : ISection) {
+    selectedSection.value = section;
+    sectionCrud.value.select(selectedSection.value);
 }
 
-function selectSectionItem (object_ : any) {
-    sectionItemCrud.value.select(object_.type_, object_.id);
+function selectSectionItem (sectionItem : ISectionItem) {
+    selectedSectionItem.value = sectionItem;
+    sectionItemCrud.value.select(selectedSectionItem.value);
 
-    if (object_.type_ == 'Articles') {
-        isSectionItemArticleSelected.value = true;
-        articleCrud.value.select(object_.id);
-    }
+    window.setTimeout(() => {
+        if (sectionItem.item_type == 'Articles') {
+            articleCrud.value.select(sectionItem.item_id);
+        }
+        else if (sectionItem.item_type == 'ProfileCollections') {
+            profilesCrud.value.select(sectionItem.item_id);
+        }
+    });
 }
 
 function storeSectionItem (object_ : any) {
-    sectionItemCrud.value.store(object_.type_, object_.id, sectionId);
+    sectionItemCrud.value.store(object_.type_, object_.id, selectedSection.value!.id);
 }
 
 function clearSection () {
-    isSectionSelected.value = false;
-    isSectionItemArticleSelected.value = false;
+    selectSection(new Section());
+}
+
+function clearSectionItem () {
+    selectSectionItem(new SectionItem());
 }
 </script>
 
@@ -58,11 +71,19 @@ function clearSection () {
         <h2>Section edit</h2>
         <SectionCrud ref="sectionCrud" @refresh="refresh" @new="clearSection" />
     </div>
-    <div class="content" v-if="isSectionSelected">
+    <div class="content" v-if="selectedSection">
         <h2>Section Item edit</h2>
-        <SectionItemCrud ref="sectionItemCrud" @refresh="refresh" />
+        <SectionItemCrud ref="sectionItemCrud" @refresh="refresh" @new="clearSectionItem" />
     </div>
-    <div class="content" v-if="isSectionItemArticleSelected">
+    <div class="content" v-if="selectedSectionItem && selectedSectionItem.item_type == 'ProfileCollections'">
+        <h2>Profile Collection edit</h2>
+        <ProfileCollectionCrud ref="profilesCrud" @store="storeSectionItem" />
+    </div>
+    <div class="content" v-if="selectedSectionItem && selectedSectionItem.item_type == 'ProfileCollections'">
+        <h2>Profile edit</h2>
+        <ProfileCrud ref="profileCrud" @store="storeSectionItem" />
+    </div>
+    <div class="content" v-if="selectedSectionItem && selectedSectionItem.item_type == 'Articles'">
         <h2>Article edit</h2>
         <ArticleCrud ref="articleCrud" @store="storeSectionItem" />
     </div>
@@ -77,4 +98,4 @@ function clearSection () {
             background: lightblue;
         }
     }
-</style>
+</style>../components/ProfileCollectionCrud.vue

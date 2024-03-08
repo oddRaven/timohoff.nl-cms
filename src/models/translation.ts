@@ -1,4 +1,4 @@
 export interface ITranslation {
-    code : string;
+    language_code : string;
     text : string;
 }

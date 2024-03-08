@@ -10,25 +10,25 @@ defineExpose({
 
 const emit = defineEmits(['new', 'refresh']);
 
-let section = ref<ISection>(new Section());
+let section = ref<ISection>();
 let dutchTitle = ref('');
 let englishTitle = ref('');
 
 function clear () {
-    section.value = new Section();
     dutchTitle.value = '';
     englishTitle.value = '';
     emit('new');
 }
 
-function select (id : number) {
-    let url : string = 'http://localhost/api/section/' + id;
+function select (sectionSubject : ISection) {
+    section.value = sectionSubject;
+    const url : string = 'http://localhost/api/section/' + section.value.id;
 
     axios.get(url)
         .then((response) => {
-            section.value = response.data;
-            dutchTitle.value = section.value!.title_translations.filter((translation) => translation.code == 'nl')[0].text;
-            englishTitle.value = section.value!.title_translations.filter((translation) => translation.code == 'en')[0].text;
+            let data : ISection = response.data as ISection;
+            dutchTitle.value = data.title_translations.filter((translation) => translation.language_code == 'nl')[0].text;
+            englishTitle.value = data.title_translations.filter((translation) => translation.language_code == 'en')[0].text;
         });
 }
 
@@ -42,8 +42,6 @@ function save () {
 }
 
 function resolveSave (response : any) {
-    section.value = response.data.section;
-
     emit('refresh');
 }
 
@@ -51,6 +49,17 @@ function update () {
     let config = {
         withCredentials: true
     };
+
+    section.value!.title_translations = [
+        {
+            language_code: 'nl',
+            text: dutchTitle.value,
+        },
+        {
+            language_code: 'en',
+            text: englishTitle.value,
+        }
+    ]
 
     let url = 'http://localhost/api/section/' + section.value!.id;
 
@@ -65,11 +74,11 @@ function store () {
 
     section.value!.title_translations = [
         {
-            code: 'nl',
+            language_code: 'nl',
             text: dutchTitle.value,
         },
         {
-            code: 'en',
+            language_code: 'en',
             text: englishTitle.value,
         }
     ]

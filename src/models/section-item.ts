@@ -14,6 +14,6 @@ export class SectionItem implements ISectionItem {
     title_translations : ITranslation [] = [];
     section_id? : number;
     item_id? : number;
-    item_type? : string;
+    item_type? : string = 'Articles';
     order : number = 0;
 };

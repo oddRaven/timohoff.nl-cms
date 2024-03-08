@@ -14,7 +14,8 @@ const emit = defineEmits(['selectSection', 'selectSectionItem']);
 const sections = ref<ISection[]>([]);
 const sectionItems = ref<ISectionItem[]>([]);
 
-let sectionId : number = 0;
+let selectedSection : ISection;
+let selectedSectionItem : ISectionItem;
 
 function refresh () {
     const config = {
@@ -34,7 +35,7 @@ function refresh () {
 }
 
 function refreshSectionItems(){
-    if (sectionId === 0) {
+    if (selectedSection == null) {
         sectionItems.value = [];
         return;
     }
@@ -45,7 +46,7 @@ function refreshSectionItems(){
         }
     };
 
-    const url = 'http://localhost/api/section-item?section_id=' + sectionId;
+    const url = 'http://localhost/api/section-item?section_id=' + selectedSection.id;
 
     axios.get(url, config)
         .then((response) => {
@@ -53,15 +54,16 @@ function refreshSectionItems(){
         });
 }
 
-function selectSection (id : number) {
-    emit('selectSection', id);
+function selectSection (section : ISection) {
+    emit('selectSection', section);
+    selectedSection = section;
 
-    sectionId = id;
     refreshSectionItems();
 }
 
-function selectSectionItem (id : number, type_ : string) {
-    emit('selectSectionItem', { 'type_': type_, 'id': id });
+function selectSectionItem (sectionItem : ISectionItem) {
+    emit('selectSectionItem', sectionItem);
+    selectedSectionItem = sectionItem;
 }
 
 onMounted(() => {
@@ -74,13 +76,13 @@ onMounted(() => {
         <div class="list">
             <header>Sections</header>
             <ul>
-                <li v-for="section in sections" :key="section.id" @click="selectSection(section.id!)"> {{ section.title }}</li>
+                <li v-for="section in sections" :key="section.id" @click="selectSection(section)"> {{ section.title }}</li>
             </ul>
         </div>
         <div class="list">
             <header>Section Items</header>
             <ul>
-                <li v-for="sectionItem in sectionItems" :key="sectionItem.item_id" @click="selectSectionItem(sectionItem.item_id!, sectionItem.item_type!)"> {{ sectionItem.title }}</li>
+                <li v-for="sectionItem in sectionItems" :key="sectionItem.item_id" @click="selectSectionItem(sectionItem)"> {{ sectionItem.title }}</li>
             </ul>
         </div>
     </div>

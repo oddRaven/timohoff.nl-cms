@@ -18,7 +18,12 @@ const englishTitle = ref<string>('');
 const dutchText = ref<string>('');
 const englishText = ref<string>('');
 
-function select (id : number) {
+function select (id? : number) {
+    if (id == null) {
+        article.value = new Article();
+        return;
+    }
+
     const url : string = 'http://localhost/api/article/' + id;
 
     const config = {
@@ -30,10 +35,10 @@ function select (id : number) {
     axios.get(url, config)
         .then((response) => {
             article.value = response.data;
-            dutchTitle.value = article.value!.title_translations.filter((translation) => translation.code == 'nl')[0].text;
-            englishTitle.value = article.value!.title_translations.filter((translation) => translation.code == 'en')[0].text;
-            dutchText.value = article.value!.text_translations.filter((translation) => translation.code == 'nl')[0].text;
-            englishText.value = article.value!.text_translations.filter((translation) => translation.code == 'en')[0].text;
+            dutchTitle.value = article.value!.title_translations.filter((translation) => translation.language_code == 'nl')[0].text;
+            englishTitle.value = article.value!.title_translations.filter((translation) => translation.language_code == 'en')[0].text;
+            dutchText.value = article.value!.text_translations.filter((translation) => translation.language_code == 'nl')[0].text;
+            englishText.value = article.value!.text_translations.filter((translation) => translation.language_code == 'en')[0].text;
         });
 }
 
@@ -81,22 +86,22 @@ function store () {
 function setTranslations () {
     article.value!.title_translations = [
         {
-            code: 'nl',
+            language_code: 'nl',
             text: dutchTitle.value,
         },
         {
-            code: 'en',
+            language_code: 'en',
             text: englishTitle.value,
         }
     ];
 
     article.value!.text_translations = [
         {
-            code: 'nl',
+            language_code: 'nl',
             text: dutchText.value,
         },
         {
-            code: 'en',
+            language_code: 'en',
             text: englishText.value,
         }
     ];
