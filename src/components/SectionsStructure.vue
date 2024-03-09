@@ -1,26 +1,32 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
-import { type ISection } from '../models/section'
-import { type ISectionItem } from '../models/section-item'
+import SectionCrud from '../components/SectionCrud.vue'
+import SectionItemCrud from '../components/SectionItemCrud.vue'
+
+import { type ISection, Section } from '../models/section'
+import { type ISectionItem, SectionItem } from '../models/section-item'
+
 import { SectionService } from '../services/section.service'
 import { SectionItemService } from '../services/section-item.service'
 
 defineExpose({
-    refresh
+    refreshSections
 });
-
-const emit = defineEmits(['selectSection', 'selectSectionItem']);
 
 const sections = ref<ISection[]>([]);
 const sectionItems = ref<ISectionItem[]>([]);
 
+const selectedSection = ref<ISection>();
+const selectedSectionItem = ref<ISectionItem>();
+
+const sectionCrud = ref();
+const sectionItemCrud = ref();
+
 const sectionService = new SectionService;
 const sectionItemService = new SectionItemService;
 
-let selectedSection : ISection;
-
-function refresh () {
+function refreshSections () {
     sectionService.getAll()
         .then(response => {
             sections.value = response.data;
@@ -30,30 +36,46 @@ function refresh () {
 }
 
 function refreshSectionItems(){
-    if (!selectedSection || !selectedSection.id) {
+    if (!selectedSection.value || !selectedSection.value.id) {
         sectionItems.value = [];
         return;
     }
 
-    sectionItemService.getBySection(selectedSection.id)
+    sectionItemService.getBySection(selectedSection.value.id)
         .then((response) => {
             sectionItems.value = response.data;
         });
 }
 
+function newSection () {
+    selectSection(new Section());
+}
+
+function newSectionItem () {
+    selectSectionItem(new SectionItem());
+}
+
 function selectSection (section : ISection) {
-    emit('selectSection', section);
-    selectedSection = section;
+    selectedSection.value = section;
 
     refreshSectionItems();
+    newSectionItem();
+
+    window.setTimeout(() => {
+        sectionCrud.value.select(selectedSection.value);
+    });
 }
 
 function selectSectionItem (sectionItem : ISectionItem) {
-    emit('selectSectionItem', sectionItem);
+    selectedSectionItem.value = sectionItem;
+
+    window.setTimeout(() => {
+        sectionItemCrud.value.select(selectedSectionItem.value);
+    });
 }
 
 onMounted(() => {
-    refresh();
+    refreshSections();
 });
 </script>
 
@@ -76,6 +98,9 @@ onMounted(() => {
             </div>
         </div>
     </div>
+
+    <SectionCrud ref="sectionCrud" @refresh="refreshSections" @new="newSection" />
+    <SectionItemCrud ref="sectionItemCrud" v-if="selectedSection && selectedSection.id" :sectionId="selectedSection.id" @refresh="refreshSectionItems" @new="newSectionItem" />
 </template>
 
 <style scoped>

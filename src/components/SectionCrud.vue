@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { type ISection } from '../models/section'
 import { SectionService } from '../services/section.service'
+import { TranslationService } from '../services/translation.service'
+import { type ISection } from '../models/section'
 
 defineExpose({
     select
@@ -15,6 +16,7 @@ const dutchTitle = ref('');
 const englishTitle = ref('');
 
 const sectionService = new SectionService;
+const translationService = new TranslationService;
 
 function clear () {
     dutchTitle.value = '';
@@ -55,16 +57,7 @@ function update () {
         return;
     }
 
-    section.value.title_translations = [
-        {
-            language_code: 'nl',
-            text: dutchTitle.value,
-        },
-        {
-            language_code: 'en',
-            text: englishTitle.value,
-        }
-    ]
+    section.value.title_translations = translationService.constructTranslations(dutchTitle.value, englishTitle.value);
 
     sectionService.put(section.value.id, section.value)
         .then(resolveSave);
@@ -75,16 +68,7 @@ function store () {
         return;
     }
 
-    section.value.title_translations = [
-        {
-            language_code: 'nl',
-            text: dutchTitle.value,
-        },
-        {
-            language_code: 'en',
-            text: englishTitle.value,
-        }
-    ]
+    section.value.title_translations = translationService.constructTranslations(dutchTitle.value, englishTitle.value);
 
     sectionService.post(section.value)
         .then(resolveSave);

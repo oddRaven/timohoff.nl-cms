@@ -20,6 +20,16 @@ export class ProfileService {
         return await this.axiosInstance.get<IProfile[]>(path, this.config);
     }
 
+    public async getByProfileCollection(profileCollectionId: number): Promise<any> {
+        const path = '';
+        const config = { ...this.config };
+        config.params = {
+            profile_collection_id: profileCollectionId
+        }
+
+        return await this.axiosInstance.get<IProfile[]>(path, config);
+    }
+
     public async get(id: number): Promise<any> {
         const path = '/' + id;
 

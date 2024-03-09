@@ -3,13 +3,14 @@ import { ref } from 'vue'
 
 import { type IArticle, Article } from '../models/article'
 import { ArticleService } from '../services/article.service'
+import { TranslationService } from '../services/translation.service'
 
 defineExpose({
     clear,
     select
 });
 
-const emit = defineEmits(['storeSectionItem']);
+const emit = defineEmits(['store']);
 
 const article = ref<IArticle>(new Article());
 
@@ -20,6 +21,7 @@ const dutchText = ref<string>('');
 const englishText = ref<string>('');
 
 const articleService = new ArticleService;
+const translationService = new TranslationService;
 
 function clear() {
     article.value = new Article();
@@ -59,7 +61,8 @@ function update () {
         return;
     }
 
-    setTranslations();
+    article.value.title_translations = translationService.constructTranslations(dutchTitle.value, englishTitle.value);
+    article.value.text_translations = translationService.constructTranslations(dutchText.value, englishText.value);
 
     articleService.put(article.value.id, article.value)
         .then((response : any) => {
@@ -68,38 +71,19 @@ function update () {
 }
 
 function store () {
-    setTranslations();
+    if(!article.value) {
+        return;
+    }
+
+    article.value.title_translations = translationService.constructTranslations(dutchTitle.value, englishTitle.value);
+    article.value.text_translations = translationService.constructTranslations(dutchText.value, englishText.value);
 
     articleService.post(article.value)
         .then((response : any) => {
-            article.value = response.data.article;
+            article.value.id = response.data.article.id;
 
-            emit('storeSectionItem', 'Articles', response.data.article.id);
+            emit('store', 'articles', response.data.article.id);
         });
-}
-
-function setTranslations () {
-    article.value!.title_translations = [
-        {
-            language_code: 'nl',
-            text: dutchTitle.value,
-        },
-        {
-            language_code: 'en',
-            text: englishTitle.value,
-        }
-    ];
-
-    article.value!.text_translations = [
-        {
-            language_code: 'nl',
-            text: dutchText.value,
-        },
-        {
-            language_code: 'en',
-            text: englishText.value,
-        }
-    ];
 }
 </script>
 

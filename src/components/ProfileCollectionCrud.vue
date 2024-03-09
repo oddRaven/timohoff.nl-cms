@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-import { type IProfile } from '../models/profile'
-import { type IProfileCollection, ProfileCollection } from '../models/profile-collection'
+import { ProfileService } from '../services/profile.service'
 import { ProfileCollectionService } from '../services/profile-collection.service'
+import { TranslationService } from '../services/translation.service'
+import { type IProfile, Profile } from '../models/profile'
+import { type IProfileCollection, ProfileCollection } from '../models/profile-collection'
 import ProfileCrud from '../components/ProfileCrud.vue'
 
 defineExpose({
@@ -14,24 +16,42 @@ defineExpose({
 const emit = defineEmits(['storeSectionItem']);
 
 const profileCollection = ref<IProfileCollection>();
+const profiles = ref<IProfile[]>();
 const selectedProfile = ref<IProfile>();
+const profileCrud = ref();
 
 const dutchTitle = ref<string>('');
 const englishTitle = ref<string>('');
 
+const profileService = new ProfileService;
 const profileCollectionService = new ProfileCollectionService;
+const translationService = new TranslationService;
 
 function clear() {
-    console.log('clear');
     profileCollection.value = new ProfileCollection();
     dutchTitle.value = '';
     englishTitle.value = '';
 }
 
+function refreshProfiles () {
+    if (!profileCollection.value || !profileCollection.value.id) {
+        profiles.value = [];
+        return;
+    }
+
+    profileService.getByProfileCollection(profileCollection.value.id)
+        .then((response : any) => {
+            profiles.value = response.data;
+        });
+}
+
+function newProfile () {
+    selectProfile(new Profile());
+}
+
 function select (id : number) {
-    console.log('selected', id);
     if (!id) {
-        profileCollection.value = new ProfileCollection();
+        clear();
         return;
     }
 
@@ -40,6 +60,8 @@ function select (id : number) {
             profileCollection.value = response.data;
             dutchTitle.value = profileCollection.value!.title_translations.filter((translation) => translation.language_code == 'nl')[0].text;
             englishTitle.value = profileCollection.value!.title_translations.filter((translation) => translation.language_code == 'en')[0].text;
+
+            refreshProfiles();
         });
 }
 
@@ -57,7 +79,7 @@ function update () {
         return;
     }
 
-    setTranslations();
+    profileCollection.value.title_translations = translationService.constructTranslations(dutchTitle.value, englishTitle.value);
 
     profileCollectionService.put(profileCollection.value.id, profileCollection.value)
         .then((response : any) => {
@@ -70,7 +92,7 @@ function store () {
         return;
     }
 
-    setTranslations();
+    profileCollection.value.title_translations = translationService.constructTranslations(dutchTitle.value, englishTitle.value);
 
     profileCollectionService.post(profileCollection.value)
         .then((response : any) => {
@@ -80,25 +102,16 @@ function store () {
         });
 }
 
-function setTranslations () {
-    profileCollection.value!.title_translations = [
-        {
-            language_code: 'nl',
-            text: dutchTitle.value,
-        },
-        {
-            language_code: 'en',
-            text: englishTitle.value,
-        }
-    ];
-}
-
 function delete_ () {
 
 }
 
 function selectProfile (profile : IProfile) {
     selectedProfile.value = profile;
+
+    window.setTimeout(() => {
+        profileCrud.value.select(selectedProfile.value);
+    });
 }
 </script>
 
@@ -117,10 +130,16 @@ function selectProfile (profile : IProfile) {
 
         <div class="row" v-if="profileCollection && profileCollection.id">
             <ul>
-                <li v-for="profile in profileCollection.profiles" :key="profile.id" :class="profile == selectedProfile && 'selected'" @click="selectProfile(profile)"> {{ profile.title }}</li>
+                <li v-for="profile in profiles" :key="profile.id" class="profile" :class="profile == selectedProfile && 'selected'" @click="selectProfile(profile)"> {{ profile.title }}</li>
             </ul>
         </div>
     </div>
 
-    <ProfileCrud ref="profileCrud" v-if="selectedProfile" />
+    <ProfileCrud ref="profileCrud" v-if="profileCollection && profileCollection.id" :profile-collection-id="profileCollection.id" @refresh="refreshProfiles" @new="newProfile"/>
 </template>
+
+<style scoped>
+.profile {
+    cursor: pointer;
+}
+</style>

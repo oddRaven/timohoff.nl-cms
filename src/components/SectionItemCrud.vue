@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+import { SectionItemService } from '../services/section-item.service'
+import { TranslationService } from '../services/translation.service'
 import ArticleCrud from '../components/ArticleCrud.vue'
 import ProfileCollectionCrud from '../components/ProfileCollectionCrud.vue'
 import { type ISectionItem } from '../models/section-item'
-import { SectionItemService } from '../services/section-item.service'
 
 defineExpose({
     select,
@@ -22,6 +23,7 @@ const articleCrud = ref();
 const profileCollectionCrud = ref();
 
 const sectionItemService = new SectionItemService;
+const translationService = new TranslationService;
 
 const options = ref([
   { text: 'Article', itemType: 'articles' },
@@ -37,7 +39,6 @@ function clear () {
 
 function select (subjectSectionItem : ISectionItem) {
     sectionItem.value = subjectSectionItem;
-    console.log('select section item', sectionItem.value.item_type);
 
     window.setTimeout(() => {
         if(!sectionItem.value){
@@ -80,16 +81,7 @@ function store (type_ : string, id : number) {
     sectionItem.value.item_id = id;
     sectionItem.value.section_id = prop['sectionId'];
 
-    sectionItem.value.title_translations = [
-        {
-            language_code: 'nl',
-            text: dutchTitle.value,
-        },
-        {
-            language_code: 'en',
-            text: englishTitle.value,
-        }
-    ];
+    sectionItem.value.title_translations = translationService.constructTranslations(dutchTitle.value, englishTitle.value);
 
     sectionItemService.post(sectionItem.value)
         .then(resolveSave);
@@ -100,16 +92,7 @@ function update () {
         return;
     }
 
-    sectionItem.value.title_translations = [
-        {
-            language_code: 'nl',
-            text: dutchTitle.value,
-        },
-        {
-            language_code: 'en',
-            text: englishTitle.value,
-        }
-    ];
+    sectionItem.value.title_translations = translationService.constructTranslations(dutchTitle.value, englishTitle.value);
 
     sectionItemService.put(sectionItem.value.item_type, sectionItem.value.item_id, sectionItem.value)
         .then(resolveSave);
@@ -123,7 +106,6 @@ function delete_ () {
     if (!sectionItem.value || !sectionItem.value.item_type || !sectionItem.value.item_id) {
         return;
     }
-
 
     sectionItemService.delete(sectionItem.value.item_type, sectionItem.value.item_id)
         .then(() => {
@@ -143,7 +125,7 @@ function delete_ () {
         <input v-if="sectionItem" type="text" v-model="dutchTitle" placeholder="Titel" >
         <input v-if="sectionItem" type="text" v-model="englishTitle" placeholder="Title" >
 
-        <select v-if="sectionItem" v-model="sectionItem.item_type">
+        <select v-if="sectionItem" v-model="sectionItem.item_type" :disabled="sectionItem.item_id != null">
             <option v-for="option in options" :key="option.itemType" :value="option.itemType">{{ option.text }}</option>
         </select>
 
@@ -152,5 +134,5 @@ function delete_ () {
     </div>
 
     <ProfileCollectionCrud ref="profileCollectionCrud" v-if="sectionItem && sectionItem.item_type == 'profile_collections'" @storeSectionItem="store" />
-    <ArticleCrud ref="articleCrud" v-if="sectionItem && sectionItem.item_type == 'articles'" @storeSectionItem="store" />
+    <ArticleCrud ref="articleCrud" v-if="sectionItem && sectionItem.item_type == 'articles'" @store="store" />
 </template>
