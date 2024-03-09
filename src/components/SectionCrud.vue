@@ -105,10 +105,14 @@ function delete_ () {
 </script>
 
 <template>
-    <input type="button" value="Nieuw" @click="clear" >
-    
-    <input v-if="section" type="text" v-model="dutchTitle" placeholder="Titel" >
-    <input v-if="section" type="text" v-model="englishTitle" placeholder="Title" >
-    <input v-if="section" type="button" value="Opslaan" @click="save" >
-    <input v-if="section" type="button" value="Verwijder" @click="delete_" >
-</template>../services/section.service
+    <div>
+        <h2>Section edit</h2>
+
+        <input type="button" value="Nieuw" @click="clear" >
+
+        <input v-if="section" type="text" v-model="dutchTitle" placeholder="Titel" >
+        <input v-if="section" type="text" v-model="englishTitle" placeholder="Title" >
+        <input v-if="section" type="button" value="Opslaan" @click="save" >
+        <input v-if="section" type="button" value="Verwijder" @click="delete_" >
+    </div>
+</template>

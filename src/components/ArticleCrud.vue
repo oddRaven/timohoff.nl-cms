@@ -5,10 +5,11 @@ import { type IArticle, Article } from '../models/article'
 import { ArticleService } from '../services/article.service'
 
 defineExpose({
+    clear,
     select
 });
 
-const emit = defineEmits(['store']);
+const emit = defineEmits(['storeSectionItem']);
 
 const article = ref<IArticle>(new Article());
 
@@ -19,6 +20,14 @@ const dutchText = ref<string>('');
 const englishText = ref<string>('');
 
 const articleService = new ArticleService;
+
+function clear() {
+    article.value = new Article();
+    dutchTitle.value = '';
+    englishTitle.value = '';
+    dutchText.value = '';
+    englishText.value = '';
+}
 
 function select (id? : number) {
     if (!id) {
@@ -65,7 +74,7 @@ function store () {
         .then((response : any) => {
             article.value = response.data.article;
 
-            emit('store', { 'type_': 'Articles', 'id': response.data.article.id });
+            emit('storeSectionItem', 'Articles', response.data.article.id);
         });
 }
 
@@ -96,6 +105,8 @@ function setTranslations () {
 
 <template>
     <div>
+        <h2>Article edit</h2>
+
         <div class="row languages">
             <div class="label"></div>
             <div class="flex-1">Dutch</div>

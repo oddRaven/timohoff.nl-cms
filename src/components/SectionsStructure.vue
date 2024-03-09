@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import axios from "axios";
 import { ref, onMounted } from 'vue'
 
 import { type ISection } from '../models/section'
@@ -20,7 +19,6 @@ const sectionService = new SectionService;
 const sectionItemService = new SectionItemService;
 
 let selectedSection : ISection;
-let selectedSectionItem : ISectionItem;
 
 function refresh () {
     sectionService.getAll()
@@ -52,7 +50,6 @@ function selectSection (section : ISection) {
 
 function selectSectionItem (sectionItem : ISectionItem) {
     emit('selectSectionItem', sectionItem);
-    selectedSectionItem = sectionItem;
 }
 
 onMounted(() => {
@@ -61,18 +58,22 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="container">
-        <div class="list">
-            <header>Sections</header>
-            <ul>
-                <li v-for="section in sections" :key="section.id" @click="selectSection(section)"> {{ section.title }}</li>
-            </ul>
-        </div>
-        <div class="list">
-            <header>Section Items</header>
-            <ul>
-                <li v-for="sectionItem in sectionItems" :key="sectionItem.item_id" @click="selectSectionItem(sectionItem)"> {{ sectionItem.title }}</li>
-            </ul>
+    <div>
+        <h2>Site Layout</h2>
+
+        <div class="container">
+            <div class="list">
+                <header>Sections</header>
+                <ul>
+                    <li v-for="section in sections" :key="section.id" @click="selectSection(section)"> {{ section.title }}</li>
+                </ul>
+            </div>
+            <div class="list">
+                <header>Section Items</header>
+                <ul>
+                    <li v-for="sectionItem in sectionItems" :key="sectionItem.item_id" @click="selectSectionItem(sectionItem)"> {{ sectionItem.title }}</li>
+                </ul>
+            </div>
         </div>
     </div>
 </template>
@@ -96,4 +97,4 @@ onMounted(() => {
             }
         }
     }
-</style>../services/section.service
+</style>

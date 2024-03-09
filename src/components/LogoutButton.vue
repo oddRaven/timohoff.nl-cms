@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import axios from "axios";
 import { useRouter } from 'vue-router';
 
 import { AuthenticationService } from '../services/authentication.service';
