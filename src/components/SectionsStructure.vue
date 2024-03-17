@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue'
 
 import SectionCrud from '../components/SectionCrud.vue'
 import SectionItemCrud from '../components/SectionItemCrud.vue'
+import SelectionList from '../components/SelectionList.vue'
 
 import { type ISection, Section } from '../models/section'
 import { type ISectionItem, SectionItem } from '../models/section-item'
@@ -22,6 +23,8 @@ const selectedSectionItem = ref<ISectionItem>();
 
 const sectionCrud = ref();
 const sectionItemCrud = ref();
+const sectionList = ref();
+const sectionItemList = ref();
 
 const sectionService = new SectionService;
 const sectionItemService = new SectionItemService;
@@ -62,6 +65,7 @@ function selectSection (section : ISection) {
     newSectionItem();
 
     window.setTimeout(() => {
+        sectionList.value.assign(selectedSection.value);
         sectionCrud.value.select(selectedSection.value);
     });
 }
@@ -70,7 +74,11 @@ function selectSectionItem (sectionItem : ISectionItem) {
     selectedSectionItem.value = sectionItem;
 
     window.setTimeout(() => {
-        sectionItemCrud.value.select(selectedSectionItem.value);
+        sectionItemList.value.assign(selectedSectionItem.value);
+
+        if (sectionItemCrud.value) {
+            sectionItemCrud.value.select(selectedSectionItem.value);
+        }
     });
 }
 
@@ -84,22 +92,8 @@ onMounted(() => {
         <h2>Site Layout</h2>
 
         <div class="container">
-            <div class="list">
-                <div class="inner-list">
-                    <header>Sections</header>
-                    <ul>
-                        <li v-for="section in sections" :key="section.id" :class="section == selectedSection && 'selected'" @click="selectSection(section)"> {{ section.title }}</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="list">
-                <div class="inner-list">
-                    <header>Section Items</header>
-                    <ul>
-                        <li v-for="sectionItem in sectionItems" :key="sectionItem.item_id" :class="sectionItem == selectedSectionItem && 'selected'" @click="selectSectionItem(sectionItem)"> {{ sectionItem.title }}</li>
-                    </ul>
-                </div>
-            </div>
+            <SelectionList ref="sectionList" listName="Sections" :items="sections" keyProperty="id" valueProperty="title" @select="selectSection" />
+            <SelectionList ref="sectionItemList" listName="Section Items" :items="sectionItems" keyProperty="item_id" valueProperty="title" @select="selectSectionItem" />
         </div>
     </div>
 
@@ -111,35 +105,5 @@ onMounted(() => {
     .container {
         display: flex;
         flex-direction: row;
-
-        .list {
-            padding: 5px;
-
-            .inner-list {
-                background: lightblue;
-            }
-
-            header {
-                font-weight: bold;
-                padding: 2px;
-            }
-
-            ul {
-                padding: 0px;
-                margin: 0px;
-
-                li {
-                    list-style: none;
-                    cursor: pointer;
-                    user-select: none;
-                    width: 100px;
-                    padding: 2px;
-
-                    &.selected {
-                        outline: 1px solid black;
-                    }
-                }
-            }
-        }
     }
 </style>

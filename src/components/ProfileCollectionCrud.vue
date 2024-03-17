@@ -7,6 +7,7 @@ import { TranslationService } from '../services/translation.service'
 import { type IProfile, Profile } from '../models/profile'
 import { type IProfileCollection, ProfileCollection } from '../models/profile-collection'
 import ProfileCrud from '../components/ProfileCrud.vue'
+import SelectionList from '@/components/SelectionList.vue'
 
 defineExpose({
     clear,
@@ -19,6 +20,7 @@ const profileCollection = ref<IProfileCollection>();
 const profiles = ref<IProfile[]>();
 const selectedProfile = ref<IProfile>();
 const profileCrud = ref();
+const profileList = ref();
 
 const dutchTitle = ref<string>('');
 const englishTitle = ref<string>('');
@@ -102,14 +104,11 @@ function store () {
         });
 }
 
-function delete_ () {
-
-}
-
 function selectProfile (profile : IProfile) {
     selectedProfile.value = profile;
 
     window.setTimeout(() => {
+        profileList.value.assign(selectedProfile.value);
         profileCrud.value.select(selectedProfile.value);
     });
 }
@@ -125,14 +124,9 @@ function selectProfile (profile : IProfile) {
             <input v-if="profileCollection" type="text" v-model="dutchTitle" placeholder="Titel" >
             <input v-if="profileCollection" type="text" v-model="englishTitle" placeholder="Title" >
             <input v-if="profileCollection" type="button" value="Opslaan" @click="save" >
-            <input v-if="profileCollection && profileCollection.id" type="button" value="Verwijder" @click="delete_" >
         </div>
 
-        <div class="row" v-if="profileCollection && profileCollection.id">
-            <ul>
-                <li v-for="profile in profiles" :key="profile.id" class="profile" :class="profile == selectedProfile && 'selected'" @click="selectProfile(profile)"> {{ profile.title }}</li>
-            </ul>
-        </div>
+        <SelectionList ref="profileList" class="row" v-if="profileCollection && profileCollection.id" listName="Profiles" :items="profiles" keyProperty="id" valueProperty="title" @select="selectProfile" />
     </div>
 
     <ProfileCrud ref="profileCrud" v-if="profileCollection && profileCollection.id" :profile-collection-id="profileCollection.id" @refresh="refreshProfiles" @new="newProfile"/>
