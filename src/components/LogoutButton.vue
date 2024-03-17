@@ -15,12 +15,12 @@ function logout(){
 </script>
 
 <template>
-    <div class="wrapper">
+    <div class="wrapper body-row">
         <input type="button" value="Logout" @click="logout">
     </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 
 .wrapper {
     text-align: right;

@@ -15,5 +15,9 @@ const sectionStructure = ref();
   </main>
 </template>
 
-<style scoped>
+<style lang="scss">
+.body-row {
+    padding: 10px;
+    outline: 1px solid black;
+}
 </style>

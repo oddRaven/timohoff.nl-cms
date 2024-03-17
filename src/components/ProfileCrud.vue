@@ -95,7 +95,7 @@ function delete_ () {
 </script>
 
 <template>
-    <div>
+    <div class="body-row">
         <h2>Profile edit</h2>
 
         <input type="button" value="Nieuw" @click="clear" >

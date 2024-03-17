@@ -80,21 +80,25 @@ onMounted(() => {
 </script>
 
 <template>
-    <div>
+    <div class="body-row">
         <h2>Site Layout</h2>
 
         <div class="container">
             <div class="list">
-                <header>Sections</header>
-                <ul>
-                    <li v-for="section in sections" :key="section.id" @click="selectSection(section)"> {{ section.title }}</li>
-                </ul>
+                <div class="inner-list">
+                    <header>Sections</header>
+                    <ul>
+                        <li v-for="section in sections" :key="section.id" :class="section == selectedSection && 'selected'" @click="selectSection(section)"> {{ section.title }}</li>
+                    </ul>
+                </div>
             </div>
             <div class="list">
-                <header>Section Items</header>
-                <ul>
-                    <li v-for="sectionItem in sectionItems" :key="sectionItem.item_id" @click="selectSectionItem(sectionItem)"> {{ sectionItem.title }}</li>
-                </ul>
+                <div class="inner-list">
+                    <header>Section Items</header>
+                    <ul>
+                        <li v-for="sectionItem in sectionItems" :key="sectionItem.item_id" :class="sectionItem == selectedSectionItem && 'selected'" @click="selectSectionItem(sectionItem)"> {{ sectionItem.title }}</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -103,22 +107,38 @@ onMounted(() => {
     <SectionItemCrud ref="sectionItemCrud" v-if="selectedSection && selectedSection.id" :sectionId="selectedSection.id" @refresh="refreshSectionItems" @new="newSectionItem" />
 </template>
 
-<style scoped>
+<style scoped lang="scss">
     .container {
         display: flex;
         flex-direction: row;
 
-        ul {
-            padding: 0px;
-            margin: 0px;
+        .list {
+            padding: 5px;
 
-            li {
-                list-style: none;
-                cursor: pointer;
-                user-select: none;
-                width: 100px;
-                background: beige;
+            .inner-list {
+                background: lightblue;
+            }
+
+            header {
+                font-weight: bold;
                 padding: 2px;
+            }
+
+            ul {
+                padding: 0px;
+                margin: 0px;
+
+                li {
+                    list-style: none;
+                    cursor: pointer;
+                    user-select: none;
+                    width: 100px;
+                    padding: 2px;
+
+                    &.selected {
+                        outline: 1px solid black;
+                    }
+                }
             }
         }
     }

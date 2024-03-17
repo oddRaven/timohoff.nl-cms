@@ -116,7 +116,7 @@ function selectProfile (profile : IProfile) {
 </script>
 
 <template>
-    <div>
+    <div class="body-row">
         <h2>Profile Collection edit</h2>
 
         <div class="row">
@@ -138,7 +138,7 @@ function selectProfile (profile : IProfile) {
     <ProfileCrud ref="profileCrud" v-if="profileCollection && profileCollection.id" :profile-collection-id="profileCollection.id" @refresh="refreshProfiles" @new="newProfile"/>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .profile {
     cursor: pointer;
 }

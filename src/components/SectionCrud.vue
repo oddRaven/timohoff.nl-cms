@@ -49,6 +49,10 @@ function save () {
 }
 
 function resolveSave (response : any) {
+    if (section.value) {
+        section.value.id = response.data.section.id;
+    }
+
     emit('refresh');
 }
 
@@ -89,7 +93,7 @@ function delete_ () {
 </script>
 
 <template>
-    <div>
+    <div class="body-row">
         <h2>Section edit</h2>
 
         <input type="button" value="Nieuw" @click="clear" >

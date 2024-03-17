@@ -88,7 +88,7 @@ function store () {
 </script>
 
 <template>
-    <div>
+    <div class="body-row">
         <h2>Article edit</h2>
 
         <div class="row languages">
@@ -120,7 +120,7 @@ function store () {
     </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .row {
     display: flex;
 }
