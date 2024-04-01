@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export class AuthenticationService {
     private axiosInstance : AxiosInstance = axios.create({
-        baseURL: "http://localhost/api/authentication"
+        baseURL: `${import.meta.env.VITE_API_URL}/authentication`
     });
 
     private config : any = {

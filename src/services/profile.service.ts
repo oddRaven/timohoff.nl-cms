@@ -5,7 +5,7 @@ import { type IProfile } from '../models/profile';
 
 export class ProfileService {
     private axiosInstance : AxiosInstance = axios.create({
-        baseURL: "http://localhost/api/profile"
+        baseURL: `${import.meta.env.VITE_API_URL}/profile`
     });
 
     private config : any = {

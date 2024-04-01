@@ -5,7 +5,7 @@ import { type ISectionItem } from '../models/section-item';
 
 export class SectionItemService {
     private axiosInstance : AxiosInstance = axios.create({
-        baseURL: "http://localhost/api/section-item"
+        baseURL: `${import.meta.env.VITE_API_URL}/section-item`
     });
 
     private config : any = {

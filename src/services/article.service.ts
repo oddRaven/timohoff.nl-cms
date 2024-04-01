@@ -5,7 +5,7 @@ import { type IArticle } from '../models/article';
 
 export class ArticleService {
     private axiosInstance : AxiosInstance = axios.create({
-        baseURL: "http://localhost/api/article"
+        baseURL: `${import.meta.env.VITE_API_URL}/article`
     });
 
     private config : any = {
