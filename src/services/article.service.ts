@@ -21,13 +21,13 @@ export class ArticleService {
     }
 
     public async get(id: number): Promise<any> {
-        const path = '/' + id;
+        const path = `/${id}?include_language_translations`;
 
         return await this.axiosInstance.get<IArticle>(path, this.config);
     }
 
     public async put(id: number, data: IArticle) : Promise<any> {
-        const path = '/' + id;
+        const path = `/${id}`;
         this.config.withCredentials = true;
 
         return await this.axiosInstance.put(path, data, this.config);
@@ -41,7 +41,7 @@ export class ArticleService {
     }
 
     public async delete(id: number) : Promise<any> {
-        const path = '/' + id;
+        const path = `/${id}`;
         this.config.withCredentials = true;
 
         return await this.axiosInstance.delete(path, this.config);
