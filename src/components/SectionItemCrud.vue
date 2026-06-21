@@ -112,6 +112,9 @@ function delete_ () {
             clear();
 
             emit('refresh');
+        })
+        .catch((error) => {
+            console.error('Error deleting section item:', error);
         });
 }
 </script>
@@ -125,8 +128,18 @@ function delete_ () {
         <input v-if="sectionItem" type="text" v-model="dutchTitle" placeholder="Titel" >
         <input v-if="sectionItem" type="text" v-model="englishTitle" placeholder="Title" >
 
-        <select v-if="sectionItem" v-model="sectionItem.item_type" :disabled="sectionItem.item_id != null">
-            <option v-for="option in options" :key="option.itemType" :value="option.itemType">{{ option.text }}</option>
+        <select
+            v-if="sectionItem"
+            v-model="sectionItem.item_type"
+            :disabled="sectionItem.item_id != null"
+        >
+            <option
+                v-for="option in options"
+                :key="option.itemType"
+                :value="option.itemType"
+            >
+                {{ option.text }}
+            </option>
         </select>
 
         <input v-if="sectionItem && sectionItem.item_id" type="button" value="Opslaan" @click="update" >

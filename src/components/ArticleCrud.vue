@@ -3,6 +3,7 @@ import { ref } from 'vue'
 
 import { type IArticle, Article } from '../models/article'
 import { ArticleService } from '../services/article.service'
+import { FileService } from '../services/file.service'
 import { TranslationService } from '../services/translation.service'
 
 defineExpose({
@@ -21,6 +22,7 @@ const dutchText = ref<string>('');
 const englishText = ref<string>('');
 
 const articleService = new ArticleService;
+const fileService = new FileService;
 const translationService = new TranslationService;
 
 function clear() {
@@ -54,6 +56,23 @@ function save () {
     else {
         store();
     }
+}
+
+function upload(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+
+    if (!file) {
+        return;
+    }
+
+    fileService.upload(file)
+        .then((response : any) => {
+            console.log('File uploaded', response.data);
+        })
+        .catch((error : any) => {
+            console.error('File upload error', error);
+        });
 }
 
 function update () {
@@ -112,6 +131,12 @@ function store () {
             </div>
             <div class="flex-1">
                 <textarea v-model="englishText" class="text" placeholder="English text"></textarea>
+            </div>
+        </div>
+        <div class="row">
+            <div class="label">Afbeelding</div>
+            <div class="flex-1">
+                <input type="file" @change="upload" />
             </div>
         </div>
         <div class="inputs">

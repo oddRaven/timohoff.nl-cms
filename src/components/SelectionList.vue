@@ -26,7 +26,7 @@ function selectItem (item: any) {
             <header> {{ prop.listName }} </header>
             <ul>
                 <li v-for="item in prop.items" :key="item[prop.keyProperty]" :class="item == selectedItem && 'selected'" @click="selectItem(item)"> 
-                    {{ item[prop.valueProperty] }}
+                    {{ item[prop.valueProperty] ?? "no name" }}
                 </li>
             </ul>
         </div>
