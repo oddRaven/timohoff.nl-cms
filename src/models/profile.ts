@@ -5,7 +5,7 @@ export interface IProfile {
     article_id? : number;
     profile_collection_id? : number;
     title : string;
-    image_path : string;
+    image_name : string;
     title_translations : ITranslation [];
 };
 
@@ -14,6 +14,6 @@ export class Profile implements IProfile {
     article_id? : number;
     profile_collection_id? : number;
     title : string = '';
-    image_path : string = '';
+    image_name : string = '';
     title_translations : ITranslation [] = [];
 };

@@ -66,7 +66,7 @@ function upload(event: Event) {
         return;
     }
 
-    fileService.upload(file)
+    fileService.upload(file, "")
         .then((response : any) => {
             console.log('File uploaded', response.data);
         })

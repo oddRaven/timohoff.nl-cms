@@ -6,24 +6,16 @@ export class FileService {
         baseURL: `${import.meta.env.VITE_API_URL}/file`
     });
 
-    public async upload(file: File, token?: string) : Promise<any> {
+    public async upload(file: File, name: string) : Promise<any> {
         const path = '/upload';
         const formData = new FormData();
 
         formData.append('file', file);
-
-        /*const resolvedToken = token
-            || localStorage.getItem('token')
-            || localStorage.getItem('access_token')
-            || '';*/
+        formData.append('name', name);
 
         const headers : any = {
             'Content-Language': 'en'
         };
-
-        /*if (resolvedToken) {
-            headers.Authorization = `Bearer ${resolvedToken}`;
-        }*/
 
         const config : any = {
             headers,
