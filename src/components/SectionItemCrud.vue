@@ -5,6 +5,7 @@ import { SectionItemService } from '../services/section-item.service'
 import { TranslationService } from '../services/translation.service'
 import ArticleCrud from '../components/ArticleCrud.vue'
 import ProfileCollectionCrud from '../components/ProfileCollectionCrud.vue'
+import TimelineCrud from '../components/TimelineCrud.vue'
 import { type ISectionItem } from '../models/section-item'
 
 defineExpose({
@@ -21,6 +22,7 @@ const dutchTitle = ref('');
 const englishTitle = ref('');
 const articleCrud = ref();
 const profileCollectionCrud = ref();
+const timelineCrud = ref();
 
 const sectionItemService = new SectionItemService;
 const translationService = new TranslationService;
@@ -51,6 +53,9 @@ function select (subjectSectionItem : ISectionItem) {
         else if (sectionItem.value.item_type == 'profile_collections') {
             profileCollectionCrud.value.clear();
         }
+        else if (sectionItem.value.item_type == 'timelines') {
+            timelineCrud.value.clear();
+        }
 
         if (!sectionItem.value.item_type || !sectionItem.value.item_id) {
             return;
@@ -68,6 +73,9 @@ function select (subjectSectionItem : ISectionItem) {
         }
         else if (sectionItem.value.item_type == 'profile_collections') {
             profileCollectionCrud.value.select(sectionItem.value.item_id);
+        }
+        else if (sectionItem.value.item_type == 'timelines') {
+            timelineCrud.value.select(sectionItem.value.item_id);
         }
     });
 }
@@ -148,4 +156,5 @@ function delete_ () {
 
     <ProfileCollectionCrud ref="profileCollectionCrud" v-if="sectionItem && sectionItem.item_type == 'profile_collections'" @storeSectionItem="store" />
     <ArticleCrud ref="articleCrud" v-if="sectionItem && sectionItem.item_type == 'articles'" @store="store" />
+    <TimelineCrud ref="timelineCrud" v-if="sectionItem && sectionItem.item_type == 'timelines'" @store="store" />
 </template>
