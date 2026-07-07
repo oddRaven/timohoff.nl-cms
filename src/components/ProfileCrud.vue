@@ -119,13 +119,21 @@ function update () {
         });
 }
 
-function store (type_ : string, articleId : number) {
+function save () {
+    if (profile.value && profile.value.id) {
+        update();
+    }
+    else {
+        store();
+    }
+}
+
+function store () {
     if (!profile.value) {
         return;
     }
 
     profile.value.profile_collection_id = prop['profileCollectionId'];
-    profile.value.article_id = articleId;
     profile.value.title_translations = translationService.constructTranslations(dutchTitle.value, englishTitle.value);
 
     if (imageName.value) {
@@ -137,6 +145,15 @@ function store (type_ : string, articleId : number) {
             profile.value!.id = response.data.profile.id;
             emit('refresh');
         });
+}
+
+function storeArticle (type_ : string, articleId : number) {
+    if (type_ != 'articles' || !profile.value) {
+        return;
+    }
+
+    profile.value.article_id = articleId;
+    save();
 }
 
 function delete_ () {
@@ -187,12 +204,12 @@ function delete_ () {
         </div>
 
         <div class="row">
-            <input v-if="profile && profile.id" type="button" value="Opslaan" @click="update" >
+            <input v-if="profile" type="button" value="Opslaan" @click="save" >
             <input v-if="profile && profile.id" type="button" value="Verwijder" @click="delete_" >
         </div>
     </div>
 
-    <ArticleCrud v-if="profile" ref="articleCrud" @store="store" />
+    <ArticleCrud v-if="profile" ref="articleCrud" @store="storeArticle" />
 </template>
 
 <style scoped lang="scss">

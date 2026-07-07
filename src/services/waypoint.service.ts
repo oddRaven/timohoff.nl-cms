@@ -31,7 +31,7 @@ export class WaypointService {
     }
 
     public async get(id: number): Promise<any> {
-        const path = '/' + id;
+        const path = `/${id}?include_language_translations`;
 
         return await this.axiosInstance.get<IWaypoint>(path, this.config);
     }
