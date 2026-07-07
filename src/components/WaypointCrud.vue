@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 
 import ArticleCrud from '../components/ArticleCrud.vue'
+import ImageUploadCrud from '../components/ImageUploadCrud.vue'
 import { type IWaypoint, Waypoint } from '../models/waypoint'
 import { TranslationService } from '../services/translation.service'
 import { WaypointService } from '../services/waypoint.service'
@@ -129,7 +130,12 @@ function delete_ () {
         <input v-if="waypoint" type="text" v-model="dutchTitle" placeholder="Titel" >
         <input v-if="waypoint" type="text" v-model="englishTitle" placeholder="Title" >
         <input v-if="waypoint" type="text" v-model="waypoint.location" placeholder="Location" >
-        <input v-if="waypoint" type="text" v-model="waypoint.image_source" placeholder="Image source" >
+        <ImageUploadCrud
+            v-if="waypoint"
+            v-model="waypoint.image_name"
+            label="Afbeelding"
+            alt="Waypoint afbeelding"
+        />
 
         <label v-if="waypoint">
             Is bound

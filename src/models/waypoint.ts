@@ -6,7 +6,7 @@ export interface IWaypoint {
     article_id? : number;
     title : string;
     location : string;
-    image_source : string;
+    image_name : string;
     is_bound : boolean;
     title_translations : ITranslation [];
 };
@@ -17,7 +17,7 @@ export class Waypoint implements IWaypoint {
     article_id? : number;
     title : string = '';
     location : string = '';
-    image_source : string = '';
+    image_name : string = '';
     is_bound : boolean = false;
     title_translations : ITranslation [] = [];
 };
